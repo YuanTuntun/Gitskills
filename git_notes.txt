@@ -1,0 +1,486 @@
+一、Git 基本工作流程
+
+最重要的一条：
+
+修改文件
+   ↓
+git status
+   ↓
+git add
+   ↓
+git commit
+   ↓
+git push
+   ↓
+GitHub
+二、查看状态
+1. 查看当前状态
+git status
+
+作用：
+
+查看当前工作区、暂存区、分支状态。
+
+例如：
+
+modified: README.md
+
+说明 README 被修改了，但还没有提交。
+
+三、文件操作
+2. 查看当前目录
+ls
+
+例如：
+
+README.md
+notes.txt
+about.txt
+3. 创建文件
+touch test.txt
+
+或者：
+
+echo "hello" > test.txt
+4. 修改文件
+
+例如：
+
+echo "hello git" >> README.md
+
+>>：
+
+在文件末尾追加内容。
+
+而：
+
+> 
+
+通常表示：
+
+覆盖原来的文件内容。
+
+这个区别很重要。
+
+5. 查看文件内容
+cat README.md
+四、暂存与提交
+6. 添加文件到暂存区
+git add README.md
+
+或者添加所有修改：
+
+git add .
+
+理解：
+
+工作区
+  ↓ git add
+暂存区
+7. 提交
+git commit -m "update README"
+
+意思：
+
+把暂存区的内容保存成一个 Git 版本。
+
+完整过程：
+
+修改文件
+   ↓
+git add
+   ↓
+暂存区
+   ↓
+git commit
+   ↓
+Git 历史
+五、查看 Git 历史
+8. 普通日志
+git log
+9. 简洁日志
+git log --oneline
+
+例如：
+
+056bb1f merge feature/conflict
+a7fa5a8 feature: update README
+dc48f0c main: update README
+ff02302 add about page
+10. 查看分支关系
+
+重点练了这个：
+
+git log --oneline --graph --all
+
+它可以把不同分支的历史画出来。
+
+例如：
+
+*   056bb1f merge feature/conflict
+|\
+| * a7fa5a8 feature: update README
+* | dc48f0c main: update README
+|/
+* ff02302 add about page
+
+这个命令非常值得记住。
+
+六、分支
+11. 查看分支
+git branch
+
+例如：
+
+* main
+  feature/login
+
+* 表示：
+
+前所在的分支。
+
+12. 创建并切换到新分支
+
+用了：
+
+git switch -c feature/conflict
+
+意思：
+
+创建 feature/conflict，然后立即切换过去。
+
+以前的写法也可以：
+
+git checkout -b feature/conflict
+
+但现在推荐：
+
+git switch -c xxx
+13. 切换分支
+git switch main
+
+或者：
+
+git switch feature/conflict
+七、Merge —— 
+14. 合并分支
+
+假设：
+
+main
+feature/about
+
+现在：
+
+main
+
+执行：
+
+git merge feature/about
+
+意思：
+
+把 feature/about 的修改合并到当前的 main。
+
+注意一个非常重要的原则：
+
+git merge 要合并的分支
+
+合并到谁，取决于你当前在哪个分支。
+
+例如：
+
+git switch main
+git merge feature/about
+
+就是：
+
+feature/about
+       ↓
+      main
+八、Fast-forward
+
+今天第一次 merge 的时候出现：
+
+Fast-forward
+
+意思简单理解：
+
+main 没有产生新的分叉，Git 可以直接把 main 往前移动。
+
+例如：
+
+A---B---C
+        ↑
+      feature
+
+main：
+
+A---B
+    ↑
+   main
+
+merge 后：
+
+A---B---C
+        ↑
+     main
+     feature
+
+不需要额外产生一个 merge commit。
+
+九、Merge Conflict —— 今天最重要的实战 ⭐⭐⭐
+
+你今天真正练了一次冲突。
+
+两个分支同时修改：
+
+README.md
+
+于是 Git 不知道应该保留哪一个。
+
+Git 会在文件中留下：
+
+<<<<<<< HEAD
+This line is from main branch.
+=======
+This line is from feature branch.
+>>>>>>> feature/conflict
+
+理解：
+
+<<<<<<< HEAD
+main 的内容
+=======
+feature 的内容
+>>>>>>> feature/conflict
+十、解决冲突
+
+第一步：
+
+cat README.md
+
+查看冲突。
+
+然后：
+
+nano README.md
+
+手动修改。
+
+把这些 Git 标记删掉：
+
+<<<<<<< HEAD
+=======
+>>>>>>> feature/conflict
+
+然后留下真正想要的内容。
+
+最后整理成：
+
+This line is from main branch.
+This line is from feature branch.
+
+
+十一、解决冲突后的流程
+
+解决冲突之后：
+
+git add README.md
+
+然后：
+
+git commit -m "merge feature/conflict"
+
+于是：
+
+冲突
+ ↓
+手动修改
+ ↓
+git add
+ ↓
+git commit
+ ↓
+merge 完成
+
+这套流程一定要记住。
+
+十二、取消 Merge
+
+如果冲突太乱，不想合并了：
+
+git merge --abort
+
+意思：
+
+放弃当前正在进行的 merge，恢复到 merge 开始之前。
+
+非常有用。
+
+十三、删除分支
+
+merge 完成后，你今天用了：
+
+git branch -d feature/conflict
+
+意思：
+
+删除已经合并的本地分支。
+
+例如：
+
+feature/conflict
+       ↓
+    merge
+       ↓
+     main
+       ↓
+删除 feature/conflict
+
+注意：
+
+删除分支不会删除已经合并进 main 的代码。
+
+十四、Push
+15. 推送到 GitHub
+git push
+
+你今天已经成功使用过。
+
+意思：
+
+本地 Git
+   ↓
+git push
+   ↓
+GitHub
+
+例如：
+
+local main
+    ↓
+origin/main
+十五、理解 origin
+
+你经常看到：
+
+origin/main
+
+这里：
+
+origin
+
+通常代表：
+
+GitHub 上的远程仓库。
+
+而：
+
+main
+
+是分支。
+
+所以：
+
+origin/main
+
+可以理解成：
+
+GitHub 上那个仓库的 main 分支。
+
+十六、========================================核心命令===================================================
+
+
+# 查看
+git status
+git branch
+git log
+git log --oneline
+git log --oneline --graph --all
+
+# 文件
+ls
+cat README.md
+touch test.txt
+
+# 暂存 / 提交
+git add README.md
+git add .
+git commit -m "message"
+
+# 分支
+git branch
+git switch -c feature/test
+git switch main
+git branch -d feature/test
+
+# 合并
+git merge feature/test
+git merge --abort
+
+# 远程
+git push
+明天复习时一定要搞懂的 5 个概念
+
+不要只背命令，真正理解这五个：
+
+① 工作区
+正在修改的文件
+② 暂存区
+git add
+
+之后进入这里。
+
+③ Commit
+git commit
+
+把当前版本记录下来。
+
+④ Branch
+main
+feature/login
+feature/conflict
+
+不同的开发线路。
+
+⑤ Merge
+feature
+   ↓
+ main
+
+把一个分支的历史合进另一个分支。
+
+
+
+完成：
+
+GitHub 仓库
+      ↓
+本地仓库
+      ↓
+修改文件
+      ↓
+git add
+      ↓
+git commit
+      ↓
+创建 feature 分支
+      ↓
+两个分支分别修改
+      ↓
+git merge
+      ↓
+产生冲突
+      ↓
+手动解决冲突
+      ↓
+git add
+      ↓
+git commit
+      ↓
+git log --graph
+      ↓
+git push
+      ↓
+GitHub
